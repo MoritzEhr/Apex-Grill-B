@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { useCart } from "@/context/CartContext";
 import { cn } from "@/lib/utils";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 interface CartSidebarProps {
   isOpen: boolean;
@@ -28,6 +34,8 @@ export function CartSidebar({ isOpen, onClose, onCheckout }: CartSidebarProps) {
   const extras = (hasInsurance ? insuranceCost : 0) + (isCO2Neutral ? co2Cost : 0) + selectedTip;
   const finalTotal = totalPrice + extras;
 
+  const hasExtras = selectedTip > 0 || hasInsurance || isCO2Neutral;
+
   return (
     <>
       {/* Overlay */}
@@ -47,7 +55,7 @@ export function CartSidebar({ isOpen, onClose, onCheckout }: CartSidebarProps) {
         )}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-border">
+        <div className="flex items-center justify-between p-4 border-b border-border">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
               <i className="fa-solid fa-shopping-bag text-primary text-lg"></i>
@@ -66,10 +74,10 @@ export function CartSidebar({ isOpen, onClose, onCheckout }: CartSidebarProps) {
           </button>
         </div>
 
-        {/* Cart Items */}
-        <div className="flex-1 overflow-y-auto p-6">
+        {/* Scrollable Content Area */}
+        <div className="flex-1 overflow-y-auto">
           {items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center">
+            <div className="flex flex-col items-center justify-center h-full text-center p-6">
               <div className="w-20 h-20 bg-secondary rounded-full flex items-center justify-center mb-4">
                 <i className="fa-solid fa-basket-shopping text-3xl text-muted-foreground"></i>
               </div>
@@ -77,156 +85,167 @@ export function CartSidebar({ isOpen, onClose, onCheckout }: CartSidebarProps) {
               <p className="text-sm text-muted-foreground">Füge leckere Gerichte hinzu!</p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {items.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex gap-4 bg-secondary/50 rounded-xl p-3 animate-fade-in"
-                >
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-card-foreground line-clamp-1">{item.name}</h4>
-                    <p className="text-sm text-muted-foreground mb-2">€{item.price.toFixed(2)}</p>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
+            <>
+              {/* Cart Items */}
+              <div className="p-4 space-y-3">
+                {items.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex gap-3 bg-secondary/50 rounded-xl p-3 animate-fade-in"
+                  >
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-card-foreground text-sm line-clamp-1">{item.name}</h4>
+                      <p className="text-sm text-muted-foreground mb-2">€{item.price.toFixed(2)}</p>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            className="w-7 h-7 rounded-lg bg-card border border-border flex items-center justify-center hover:bg-secondary transition-colors"
+                            aria-label="Decrease quantity"
+                          >
+                            <i className="fa-solid fa-minus text-xs"></i>
+                          </button>
+                          <span className="w-6 text-center font-semibold text-card-foreground text-sm">{item.quantity}</span>
+                          <button
+                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            className="w-7 h-7 rounded-lg bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors"
+                            aria-label="Increase quantity"
+                          >
+                            <i className="fa-solid fa-plus text-xs"></i>
+                          </button>
+                        </div>
                         <button
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          className="w-8 h-8 rounded-lg bg-card border border-border flex items-center justify-center hover:bg-secondary transition-colors"
-                          aria-label="Decrease quantity"
+                          onClick={() => removeItem(item.id)}
+                          className="text-muted-foreground hover:text-destructive transition-colors"
+                          aria-label="Remove item"
                         >
-                          <i className="fa-solid fa-minus text-xs"></i>
-                        </button>
-                        <span className="w-8 text-center font-semibold text-card-foreground">{item.quantity}</span>
-                        <button
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors"
-                          aria-label="Increase quantity"
-                        >
-                          <i className="fa-solid fa-plus text-xs"></i>
+                          <i className="fa-solid fa-trash-can text-sm"></i>
                         </button>
                       </div>
-                      <button
-                        onClick={() => removeItem(item.id)}
-                        className="text-muted-foreground hover:text-destructive transition-colors"
-                        aria-label="Remove item"
-                      >
-                        <i className="fa-solid fa-trash-can"></i>
-                      </button>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+
+              {/* Checkout Options Accordion */}
+              <div className="px-4 pb-4">
+                <Accordion type="single" collapsible className="w-full">
+                  <AccordionItem value="extras" className="border rounded-xl bg-secondary/30">
+                    <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                      <div className="flex items-center gap-2">
+                        <i className="fa-solid fa-sliders text-primary"></i>
+                        <span className="font-medium text-card-foreground">Extras & Optionen</span>
+                        {hasExtras && (
+                          <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">
+                            +€{extras.toFixed(2)}
+                          </span>
+                        )}
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-4 pb-4 space-y-4">
+                      {/* Tip Selection */}
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <i className="fa-solid fa-heart text-primary text-sm"></i>
+                          <span className="text-sm font-medium text-card-foreground">Trinkgeld für den Fahrer</span>
+                        </div>
+                        <div className="flex gap-2">
+                          {tipOptions.map((tip) => (
+                            <button
+                              key={tip.value}
+                              onClick={() => setSelectedTip(tip.value)}
+                              className={cn(
+                                "flex-1 py-2 px-2 rounded-lg text-xs font-medium transition-all",
+                                selectedTip === tip.value
+                                  ? "bg-primary text-primary-foreground"
+                                  : "bg-card border border-border text-card-foreground hover:bg-secondary"
+                              )}
+                            >
+                              {tip.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Delivery Insurance */}
+                      <label className="flex items-center gap-3 p-3 bg-card rounded-xl cursor-pointer hover:bg-secondary/50 transition-colors border border-border">
+                        <input
+                          type="checkbox"
+                          checked={hasInsurance}
+                          onChange={(e) => setHasInsurance(e.target.checked)}
+                          className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <i className="fa-solid fa-shield-halved text-blue-500 text-sm"></i>
+                            <span className="font-medium text-card-foreground text-sm">Lieferversicherung</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground">Schutz bei Problemen</p>
+                        </div>
+                        <span className="text-xs font-semibold text-card-foreground">+€{insuranceCost.toFixed(2)}</span>
+                      </label>
+
+                      {/* CO2 Neutral Delivery */}
+                      <label className="flex items-center gap-3 p-3 bg-card rounded-xl cursor-pointer hover:bg-secondary/50 transition-colors border border-border">
+                        <input
+                          type="checkbox"
+                          checked={isCO2Neutral}
+                          onChange={(e) => setIsCO2Neutral(e.target.checked)}
+                          className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <i className="fa-solid fa-leaf text-green-500 text-sm"></i>
+                            <span className="font-medium text-card-foreground text-sm">CO2-neutral liefern</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground">Klimaschutz unterstützen</p>
+                        </div>
+                        <span className="text-xs font-semibold text-card-foreground">+€{co2Cost.toFixed(2)}</span>
+                      </label>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </div>
+            </>
           )}
         </div>
 
-        {/* Footer with Options */}
+        {/* Fixed Footer */}
         {items.length > 0 && (
-          <div className="p-6 border-t border-border bg-card space-y-4">
-            {/* Tip Selection */}
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <i className="fa-solid fa-heart text-primary text-sm"></i>
-                <span className="text-sm font-medium text-card-foreground">Trinkgeld für den Fahrer</span>
-              </div>
-              <div className="flex gap-2">
-                {tipOptions.map((tip) => (
-                  <button
-                    key={tip.value}
-                    onClick={() => setSelectedTip(tip.value)}
-                    className={cn(
-                      "flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all",
-                      selectedTip === tip.value
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-secondary text-card-foreground hover:bg-secondary/80"
-                    )}
-                  >
-                    {tip.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Delivery Insurance */}
-            <label className="flex items-center gap-3 p-3 bg-secondary/50 rounded-xl cursor-pointer hover:bg-secondary/70 transition-colors">
-              <input
-                type="checkbox"
-                checked={hasInsurance}
-                onChange={(e) => setHasInsurance(e.target.checked)}
-                className="w-5 h-5 rounded border-border text-primary focus:ring-primary"
-              />
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <i className="fa-solid fa-shield-halved text-blue-500"></i>
-                  <span className="font-medium text-card-foreground">Lieferversicherung</span>
-                </div>
-                <p className="text-xs text-muted-foreground">Schutz bei Problemen mit der Lieferung</p>
-              </div>
-              <span className="text-sm font-semibold text-card-foreground">+€{insuranceCost.toFixed(2)}</span>
-            </label>
-
-            {/* CO2 Neutral Delivery */}
-            <label className="flex items-center gap-3 p-3 bg-secondary/50 rounded-xl cursor-pointer hover:bg-secondary/70 transition-colors">
-              <input
-                type="checkbox"
-                checked={isCO2Neutral}
-                onChange={(e) => setIsCO2Neutral(e.target.checked)}
-                className="w-5 h-5 rounded border-border text-primary focus:ring-primary"
-              />
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <i className="fa-solid fa-leaf text-green-500"></i>
-                  <span className="font-medium text-card-foreground">CO2-neutral liefern</span>
-                </div>
-                <p className="text-xs text-muted-foreground">Unterstütze Klimaschutzprojekte</p>
-              </div>
-              <span className="text-sm font-semibold text-card-foreground">+€{co2Cost.toFixed(2)}</span>
-            </label>
-
-            {/* Price Breakdown */}
-            <div className="space-y-2 pt-2 border-t border-border">
-              <div className="flex items-center justify-between text-sm">
+          <div className="p-4 border-t border-border bg-card">
+            {/* Compact Price Summary */}
+            <div className="space-y-1 mb-3 text-sm">
+              <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Zwischensumme</span>
                 <span className="text-card-foreground">€{totalPrice.toFixed(2)}</span>
               </div>
-              {selectedTip > 0 && (
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Trinkgeld</span>
-                  <span className="text-card-foreground">€{selectedTip.toFixed(2)}</span>
+              {hasExtras && (
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Extras</span>
+                  <span className="text-card-foreground">€{extras.toFixed(2)}</span>
                 </div>
               )}
-              {hasInsurance && (
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Lieferversicherung</span>
-                  <span className="text-card-foreground">€{insuranceCost.toFixed(2)}</span>
-                </div>
-              )}
-              {isCO2Neutral && (
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">CO2-neutral</span>
-                  <span className="text-card-foreground">€{co2Cost.toFixed(2)}</span>
-                </div>
-              )}
-              <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Lieferung</span>
                 <span className="text-green-500 font-medium">Kostenlos</span>
               </div>
             </div>
 
             {/* Total */}
-            <div className="flex items-center justify-between pt-3 border-t border-border">
+            <div className="flex items-center justify-between py-3 border-t border-border mb-3">
               <span className="text-lg font-bold text-card-foreground">Gesamt</span>
               <span className="text-2xl font-bold text-primary">€{finalTotal.toFixed(2)}</span>
             </div>
 
             <button
               onClick={onCheckout}
-              className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-bold text-lg hover:bg-primary/90 transition-all shadow-glow hover:shadow-lg flex items-center justify-center gap-2"
+              className="w-full py-3 bg-primary text-primary-foreground rounded-xl font-bold text-base hover:bg-primary/90 transition-all shadow-glow hover:shadow-lg flex items-center justify-center gap-2"
             >
               <i className="fa-solid fa-bag-shopping"></i>
               Jetzt bestellen
