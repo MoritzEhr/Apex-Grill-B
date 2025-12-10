@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useCart } from "@/context/CartContext";
 import { cn } from "@/lib/utils";
 
@@ -7,8 +8,25 @@ interface CartSidebarProps {
   onCheckout: () => void;
 }
 
+const tipOptions = [
+  { label: "Kein", value: 0 },
+  { label: "€1", value: 1 },
+  { label: "€2", value: 2 },
+  { label: "€3", value: 3 },
+  { label: "€5", value: 5 },
+];
+
 export function CartSidebar({ isOpen, onClose, onCheckout }: CartSidebarProps) {
   const { items, updateQuantity, removeItem, totalPrice, totalItems } = useCart();
+  const [selectedTip, setSelectedTip] = useState(0);
+  const [hasInsurance, setHasInsurance] = useState(false);
+  const [isCO2Neutral, setIsCO2Neutral] = useState(false);
+
+  const insuranceCost = 0.99;
+  const co2Cost = 0.49;
+
+  const extras = (hasInsurance ? insuranceCost : 0) + (isCO2Neutral ? co2Cost : 0) + selectedTip;
+  const finalTotal = totalPrice + extras;
 
   return (
     <>
@@ -35,8 +53,8 @@ export function CartSidebar({ isOpen, onClose, onCheckout }: CartSidebarProps) {
               <i className="fa-solid fa-shopping-bag text-primary text-lg"></i>
             </div>
             <div>
-              <h2 className="text-xl font-bold text-card-foreground">Your Cart</h2>
-              <p className="text-sm text-muted-foreground">{totalItems} items</p>
+              <h2 className="text-xl font-bold text-card-foreground">Warenkorb</h2>
+              <p className="text-sm text-muted-foreground">{totalItems} Artikel</p>
             </div>
           </div>
           <button
@@ -55,8 +73,8 @@ export function CartSidebar({ isOpen, onClose, onCheckout }: CartSidebarProps) {
               <div className="w-20 h-20 bg-secondary rounded-full flex items-center justify-center mb-4">
                 <i className="fa-solid fa-basket-shopping text-3xl text-muted-foreground"></i>
               </div>
-              <h3 className="text-lg font-semibold text-card-foreground mb-2">Your cart is empty</h3>
-              <p className="text-sm text-muted-foreground">Add some delicious items to get started!</p>
+              <h3 className="text-lg font-semibold text-card-foreground mb-2">Dein Warenkorb ist leer</h3>
+              <p className="text-sm text-muted-foreground">Füge leckere Gerichte hinzu!</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -107,27 +125,111 @@ export function CartSidebar({ isOpen, onClose, onCheckout }: CartSidebarProps) {
           )}
         </div>
 
-        {/* Footer */}
+        {/* Footer with Options */}
         {items.length > 0 && (
-          <div className="p-6 border-t border-border bg-card">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span className="font-semibold text-card-foreground">€{totalPrice.toFixed(2)}</span>
+          <div className="p-6 border-t border-border bg-card space-y-4">
+            {/* Tip Selection */}
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <i className="fa-solid fa-heart text-primary text-sm"></i>
+                <span className="text-sm font-medium text-card-foreground">Trinkgeld für den Fahrer</span>
+              </div>
+              <div className="flex gap-2">
+                {tipOptions.map((tip) => (
+                  <button
+                    key={tip.value}
+                    onClick={() => setSelectedTip(tip.value)}
+                    className={cn(
+                      "flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all",
+                      selectedTip === tip.value
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-secondary text-card-foreground hover:bg-secondary/80"
+                    )}
+                  >
+                    {tip.label}
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="flex items-center justify-between mb-6">
-              <span className="text-muted-foreground">Delivery</span>
-              <span className="text-success font-medium">Free</span>
+
+            {/* Delivery Insurance */}
+            <label className="flex items-center gap-3 p-3 bg-secondary/50 rounded-xl cursor-pointer hover:bg-secondary/70 transition-colors">
+              <input
+                type="checkbox"
+                checked={hasInsurance}
+                onChange={(e) => setHasInsurance(e.target.checked)}
+                className="w-5 h-5 rounded border-border text-primary focus:ring-primary"
+              />
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <i className="fa-solid fa-shield-halved text-blue-500"></i>
+                  <span className="font-medium text-card-foreground">Lieferversicherung</span>
+                </div>
+                <p className="text-xs text-muted-foreground">Schutz bei Problemen mit der Lieferung</p>
+              </div>
+              <span className="text-sm font-semibold text-card-foreground">+€{insuranceCost.toFixed(2)}</span>
+            </label>
+
+            {/* CO2 Neutral Delivery */}
+            <label className="flex items-center gap-3 p-3 bg-secondary/50 rounded-xl cursor-pointer hover:bg-secondary/70 transition-colors">
+              <input
+                type="checkbox"
+                checked={isCO2Neutral}
+                onChange={(e) => setIsCO2Neutral(e.target.checked)}
+                className="w-5 h-5 rounded border-border text-primary focus:ring-primary"
+              />
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <i className="fa-solid fa-leaf text-green-500"></i>
+                  <span className="font-medium text-card-foreground">CO2-neutral liefern</span>
+                </div>
+                <p className="text-xs text-muted-foreground">Unterstütze Klimaschutzprojekte</p>
+              </div>
+              <span className="text-sm font-semibold text-card-foreground">+€{co2Cost.toFixed(2)}</span>
+            </label>
+
+            {/* Price Breakdown */}
+            <div className="space-y-2 pt-2 border-t border-border">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Zwischensumme</span>
+                <span className="text-card-foreground">€{totalPrice.toFixed(2)}</span>
+              </div>
+              {selectedTip > 0 && (
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Trinkgeld</span>
+                  <span className="text-card-foreground">€{selectedTip.toFixed(2)}</span>
+                </div>
+              )}
+              {hasInsurance && (
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Lieferversicherung</span>
+                  <span className="text-card-foreground">€{insuranceCost.toFixed(2)}</span>
+                </div>
+              )}
+              {isCO2Neutral && (
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">CO2-neutral</span>
+                  <span className="text-card-foreground">€{co2Cost.toFixed(2)}</span>
+                </div>
+              )}
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Lieferung</span>
+                <span className="text-green-500 font-medium">Kostenlos</span>
+              </div>
             </div>
-            <div className="flex items-center justify-between mb-6 pt-4 border-t border-border">
-              <span className="text-lg font-bold text-card-foreground">Total</span>
-              <span className="text-2xl font-bold text-primary">€{totalPrice.toFixed(2)}</span>
+
+            {/* Total */}
+            <div className="flex items-center justify-between pt-3 border-t border-border">
+              <span className="text-lg font-bold text-card-foreground">Gesamt</span>
+              <span className="text-2xl font-bold text-primary">€{finalTotal.toFixed(2)}</span>
             </div>
+
             <button
               onClick={onCheckout}
               className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-bold text-lg hover:bg-primary/90 transition-all shadow-glow hover:shadow-lg flex items-center justify-center gap-2"
             >
               <i className="fa-solid fa-bag-shopping"></i>
-              Order Now
+              Jetzt bestellen
             </button>
           </div>
         )}
