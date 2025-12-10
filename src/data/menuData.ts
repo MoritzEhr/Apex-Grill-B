@@ -159,7 +159,7 @@ export const menuItems: MenuItem[] = [
     name: "Falafel Wrap",
     description: "Crispy falafel, hummus, tabbouleh, and tahini in warm flatbread",
     price: 7.90,
-    image: "https://images.unsplash.com/photo-1593967853053-09e8f0a5e8b3?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=400&h=300&fit=crop",
     category: "vegetarian",
   },
   {
@@ -269,7 +269,7 @@ export const menuItems: MenuItem[] = [
     name: "Ayran",
     description: "Traditional Turkish yogurt drink, refreshing and cold",
     price: 2.50,
-    image: "https://images.unsplash.com/photo-1571950006959-3c8c71843f55?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&h=300&fit=crop",
     category: "drinks",
   },
   {
