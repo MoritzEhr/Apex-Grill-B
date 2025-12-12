@@ -22,6 +22,8 @@ const tipOptions = [
   { label: "20%", value: 0.20 },
 ];
 
+const MINIMUM_ORDER_VALUE = 25; // Minimum order value in euros
+
 export function CartSidebar({ isOpen, onClose, onCheckout }: CartSidebarProps) {
   const { items, updateQuantity, removeItem, totalPrice, totalItems } = useCart();
   const [selectedTipPercent, setSelectedTipPercent] = useState(0);
@@ -39,12 +41,20 @@ export function CartSidebar({ isOpen, onClose, onCheckout }: CartSidebarProps) {
   const finalTotal = totalPrice + extras + deliveryFee;
 
   const hasExtras = selectedTipPercent > 0 || hasInsurance || isCO2Neutral;
+  const meetsMinimumOrder = totalPrice >= MINIMUM_ORDER_VALUE;
+  const remainingAmount = Math.max(0, MINIMUM_ORDER_VALUE - totalPrice);
 
   const handleProceedToCheckout = () => {
+    if (!meetsMinimumOrder) {
+      return;
+    }
     setShowOrderSummary(true);
   };
 
   const handleConfirmOrder = () => {
+    if (!meetsMinimumOrder) {
+      return;
+    }
     setShowOrderSummary(false);
     onCheckout();
   };
@@ -161,9 +171,28 @@ export function CartSidebar({ isOpen, onClose, onCheckout }: CartSidebarProps) {
 
             {/* Confirm Button */}
             <div className="p-4 border-t border-border bg-card">
+              {!meetsMinimumOrder && (
+                <div className="mb-3 p-3 bg-warning/10 border border-warning/20 rounded-lg">
+                  <div className="flex items-center gap-2 text-warning">
+                    <i className="fa-solid fa-exclamation-triangle"></i>
+                    <span className="text-sm font-medium">
+                      Mindestbestellwert: {MINIMUM_ORDER_VALUE}€
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Noch {remainingAmount.toFixed(2)}€ bis zum Mindestbestellwert
+                  </p>
+                </div>
+              )}
               <button
                 onClick={handleConfirmOrder}
-                className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-bold text-base hover:bg-primary/90 transition-all shadow-glow hover:shadow-lg flex items-center justify-center gap-2"
+                disabled={!meetsMinimumOrder}
+                className={cn(
+                  "w-full py-4 rounded-xl font-bold text-base transition-all shadow-glow flex items-center justify-center gap-2",
+                  meetsMinimumOrder
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-lg"
+                    : "bg-muted text-muted-foreground cursor-not-allowed opacity-50"
+                )}
               >
                 <i className="fa-solid fa-check"></i>
                 Confirm Order - {finalTotal.toFixed(2)}€
@@ -193,7 +222,7 @@ export function CartSidebar({ isOpen, onClose, onCheckout }: CartSidebarProps) {
             </div>
 
             {/* Scrollable Content Area */}
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto min-h-0">
               {items.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center p-6">
                   <div className="w-20 h-20 bg-secondary rounded-full flex items-center justify-center mb-4">
@@ -339,9 +368,9 @@ export function CartSidebar({ isOpen, onClose, onCheckout }: CartSidebarProps) {
               )}
             </div>
 
-            {/* Fixed Footer */}
+            {/* Fixed Footer - Always at bottom */}
             {items.length > 0 && (
-              <div className="p-4 border-t border-border bg-card">
+              <div className="cart-footer p-4 border-t border-border bg-card flex-shrink-0">
                 {/* Compact Price Summary */}
                 <div className="space-y-1 mb-3 text-sm">
                   <div className="flex items-center justify-between">
@@ -366,9 +395,30 @@ export function CartSidebar({ isOpen, onClose, onCheckout }: CartSidebarProps) {
                   <span className="text-2xl font-bold text-primary">{finalTotal.toFixed(2)}€</span>
                 </div>
 
+                {/* Minimum Order Value Warning */}
+                {!meetsMinimumOrder && (
+                  <div className="mb-3 p-3 bg-warning/10 border border-warning/20 rounded-lg">
+                    <div className="flex items-center gap-2 text-warning">
+                      <i className="fa-solid fa-exclamation-triangle"></i>
+                      <span className="text-sm font-medium">
+                        Mindestbestellwert: {MINIMUM_ORDER_VALUE}€
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Noch {remainingAmount.toFixed(2)}€ bis zum Mindestbestellwert
+                    </p>
+                  </div>
+                )}
+
                 <button
                   onClick={handleProceedToCheckout}
-                  className="w-full py-3 bg-primary text-primary-foreground rounded-xl font-bold text-base hover:bg-primary/90 transition-all shadow-glow hover:shadow-lg flex items-center justify-center gap-2"
+                  disabled={!meetsMinimumOrder}
+                  className={cn(
+                    "w-full py-3 rounded-xl font-bold text-base transition-all shadow-glow flex items-center justify-center gap-2",
+                    meetsMinimumOrder
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-lg"
+                      : "bg-muted text-muted-foreground cursor-not-allowed opacity-50"
+                  )}
                 >
                   <i className="fa-solid fa-bag-shopping"></i>
                   Order Now

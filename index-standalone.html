@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Kebab & Grill | Fresh & Delicious Food Delivery</title>
+    <meta name="description" content="Order delicious döner, burgers, pizza, and more from City Kebab & Grill. Fresh ingredients, fast delivery, amazing taste. Order online now!">
+    <meta name="author" content="City Kebab & Grill">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    
+    <meta property="og:title" content="City Kebab & Grill | Fresh & Delicious Food Delivery">
+    <meta property="og:description" content="Order delicious döner, burgers, pizza, and more. Fresh ingredients, fast delivery!">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@CityKebabGrill">
+    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-container">
+            <!-- Logo -->
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-utensils"></i>
+                </div>
+                <div class="logo-text">
+                    <h1 class="logo-title">City Kebab</h1>
+                    <p class="logo-subtitle">& Grill</p>
+                </div>
+            </div>
+
+            <!-- Search Bar - Desktop -->
+            <div class="search-desktop">
+                <div class="search-wrapper">
+                    <input type="text" id="searchInput" placeholder="Search dishes..." class="search-input">
+                    <button id="clearSearch" class="clear-search-btn" style="display: none;">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Actions -->
+            <div class="header-actions">
+                <!-- Theme Toggle -->
+                <button id="themeToggle" class="action-btn" aria-label="Toggle theme">
+                    <i class="fa-solid fa-moon theme-icon"></i>
+                </button>
+
+                <!-- Cart Button -->
+                <button id="cartToggle" class="cart-btn" aria-label="Open cart">
+                    <i class="fa-solid fa-shopping-bag"></i>
+                    <span id="cartBadge" class="cart-badge" style="display: none;">0</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Search Bar -->
+        <div id="mobileSearch" class="mobile-search" style="display: none;">
+            <div class="search-wrapper">
+                <input type="text" id="mobileSearchInput" placeholder="Search dishes..." class="search-input">
+                <button id="clearMobileSearch" class="clear-search-btn" style="display: none;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-background">
+            <img src="https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=1200&h=500&fit=crop" alt="Delicious döner kebab with fresh vegetables" class="hero-image">
+            <div class="hero-overlay-1"></div>
+            <div class="hero-overlay-2"></div>
+        </div>
+        <div class="container hero-content">
+            <div class="hero-text">
+                <div class="hero-badges">
+                    <span class="badge badge-success">
+                        <i class="fa-solid fa-circle badge-pulse"></i>
+                        Open Now
+                    </span>
+                    <span class="badge badge-primary">
+                        <i class="fa-solid fa-bolt"></i>
+                        Fast Delivery
+                    </span>
+                </div>
+                <h1 class="hero-title">
+                    City Kebab
+                    <span class="text-primary"> & Grill</span>
+                </h1>
+                <p class="hero-description">
+                    Fresh ingredients, authentic flavors. From juicy döners to crispy schnitzels – taste the difference!
+                </p>
+                <div class="hero-info">
+                    <div class="info-item">
+                        <i class="fa-solid fa-star text-warning"></i>
+                        <span class="info-value">4.8</span>
+                        <span class="info-label">(2,847 reviews)</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fa-solid fa-clock text-primary"></i>
+                        <span class="info-value">11:00 - 23:00</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fa-solid fa-truck text-primary"></i>
+                        <span class="info-value">20-35 min</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Category Bar -->
+    <div class="category-bar">
+        <div class="container">
+            <div class="category-scroll">
+                <button class="category-btn active" data-category="all">
+                    <i class="fa-solid fa-grip"></i>
+                    All Items
+                </button>
+                <!-- Categories will be inserted by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Grid -->
+    <section class="menu-section">
+        <div class="container">
+            <div id="searchResults" class="search-results" style="display: none;">
+                <h2 class="search-results-title"></h2>
+                <p class="search-results-count"></p>
+            </div>
+            <div id="menuGrid" class="menu-grid">
+                <!-- Menu items will be inserted by JS -->
+            </div>
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <div class="empty-icon">
+                    <i class="fa-solid fa-search"></i>
+                </div>
+                <h3>No dishes found</h3>
+                <p>Try a different search term</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <!-- Brand -->
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <div class="logo-icon">
+                            <i class="fa-solid fa-utensils"></i>
+                        </div>
+                        <div>
+                            <h3 class="footer-title">City Kebab</h3>
+                            <p class="footer-subtitle">& Grill</p>
+                        </div>
+                    </div>
+                    <p class="footer-description">
+                        Serving the freshest and most delicious döner, burgers, pizza, and more since 2010. Quality ingredients, authentic recipes.
+                    </p>
+                    <div class="footer-social">
+                        <a href="#" class="social-link">
+                            <i class="fa-brands fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fa-brands fa-instagram"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fa-brands fa-tiktok"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Contact -->
+                <div class="footer-column">
+                    <h4 class="footer-heading">Contact Us</h4>
+                    <ul class="footer-list">
+                        <li>
+                            <i class="fa-solid fa-location-dot text-primary"></i>
+                            Hauptstraße 123, 10115 Berlin
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-phone text-primary"></i>
+                            +49 30 1234567
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-envelope text-primary"></i>
+                            info@citykebab.de
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Hours -->
+                <div class="footer-column">
+                    <h4 class="footer-heading">Opening Hours</h4>
+                    <ul class="footer-hours">
+                        <li>
+                            <span>Mon - Thu</span>
+                            <span>11:00 - 22:00</span>
+                        </li>
+                        <li>
+                            <span>Fri - Sat</span>
+                            <span>11:00 - 23:00</span>
+                        </li>
+                        <li>
+                            <span>Sunday</span>
+                            <span>12:00 - 22:00</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p class="footer-copyright">
+                    © 2024 City Kebab & Grill. All rights reserved.
+                </p>
+                <div class="footer-links">
+                    <a href="#" class="footer-link">Privacy Policy</a>
+                    <a href="#" class="footer-link">Terms of Service</a>
+                    <a href="#" class="footer-link">Imprint</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cart Sidebar -->
+    <div id="cartOverlay" class="cart-overlay" style="display: none;"></div>
+    <aside id="cartSidebar" class="cart-sidebar">
+        <!-- Cart content will be inserted by JS -->
+    </aside>
+
+    <!-- Order Confirmation Modal -->
+    <div id="orderModal" class="order-modal" style="display: none;">
+        <div class="order-modal-overlay"></div>
+        <div class="order-modal-content">
+            <div class="order-success-icon">
+                <div class="success-circle">
+                    <div class="success-inner">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="order-modal-body">
+                <h2 class="order-modal-title">Order Confirmed!</h2>
+                <p class="order-modal-text">
+                    Thank you for your order! Your delicious food is being prepared and will be delivered to you soon.
+                </p>
+                <div class="order-details">
+                    <div class="order-detail-item">
+                        <i class="fa-solid fa-clock text-primary"></i>
+                        <span>Est. 25-35 min</span>
+                    </div>
+                    <div class="order-detail-item">
+                        <i class="fa-solid fa-location-dot text-primary"></i>
+                        <span>Tracking live</span>
+                    </div>
+                </div>
+                <button id="closeOrderModal" class="order-modal-btn">Continue Browsing</button>
+            </div>
+            <div class="order-modal-deco-1"></div>
+            <div class="order-modal-deco-2"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
