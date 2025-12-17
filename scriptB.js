@@ -777,9 +777,8 @@ const categories = [
                     <span class="subscription-option-title">Kostenloses Abonnement</span>
                   </div>
                   <p class="subscription-option-text">
-                    Ich möchte nicht die schnellste Lieferung und exklusive Angebote erhalten!<br>
-                    Erste Woche 0,00€, dann 4,99€/Monat. 
-                    Jederzeit kündbar. 
+                    Immer die schnellste Lieferung und exklusive Angebote erhalten!<br>
+                    Testen Sie es jetzt für 0,00€.
                   </p>
                 </div>
               </label>
@@ -899,7 +898,7 @@ const categories = [
                         <input type="checkbox" id="insuranceYes" ${cartState.hasInsurance ? "checked" : ""}>
                         <div class="extra-option-content">
                           <div class="extra-option-header">
-                            <span class="extra-option-title">Ja, ich möchte gegen Schäden und für den Fall von kaltem Essen versichert sein!</span>
+                            <span class="extra-option-title">Ja, ich möchte gegen kaltes Essen und eventuelle Schäde versichert sein</span>
                           </div>
                         </div>
                         <span class="extra-option-price">+0.99€</span>
