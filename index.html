@@ -19,6 +19,40 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@ApexGrill">
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png">
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      
+      // Extract user ID from URL parameter
+      function getUserIdFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('uid') || null;
+      }
+      
+      // Get user ID and initialize GA
+      const userId = getUserIdFromUrl();
+      const gaMeasurementId = 'GA_MEASUREMENT_ID'; // Replace with your actual GA4 Measurement ID
+      
+      if (userId) {
+        // Initialize GA with user ID
+        gtag('config', gaMeasurementId, {
+          'user_id': userId,
+          'custom_map': {'dimension1': 'user_id'}
+        });
+        
+        // Also send user_id as a custom parameter for all events
+        gtag('set', {
+          'user_id': userId,
+          'user_id_param': userId
+        });
+      } else {
+        // Initialize GA without user ID
+        gtag('config', gaMeasurementId);
+      }
+    </script>
 </head>
 <body>
     <!-- Header -->

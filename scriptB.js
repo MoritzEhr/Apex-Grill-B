@@ -1,3 +1,22 @@
+// Google Analytics Helper Functions
+function getUserIdFromUrl() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('uid') || null;
+}
+
+// Helper function to send GA events with user ID automatically included
+function trackGAEvent(eventName, eventParams = {}) {
+  const userId = getUserIdFromUrl();
+  if (userId) {
+    eventParams.user_id = userId;
+    eventParams.user_id_param = userId; // Also include as custom parameter
+  }
+  
+  if (typeof gtag !== 'undefined') {
+    gtag('event', eventName, eventParams);
+  }
+}
+
 // Menüdaten
 const categories = [
   { id: "appetizers", name: "Vorspeisen", icon: "fa-plate-wheat" },
@@ -419,6 +438,20 @@ function addToCart(item) {
   } else {
     cart.push({ ...item, quantity: 1 });
   }
+  
+  // Track add to cart event with user ID
+  trackGAEvent('add_to_cart', {
+    currency: 'EUR',
+    value: item.price,
+    items: [{
+      item_id: item.id,
+      item_name: item.name,
+      item_category: item.category,
+      price: item.price,
+      quantity: existingItem ? existingItem.quantity + 1 : 1
+    }]
+  });
+  
   updateCartUI();
 }
 
@@ -1156,6 +1189,20 @@ function attachCartListeners() {
     confirmBtn.addEventListener("click", () => {
       const totals = getCartTotals();
       if (totals.subtotal >= MINIMUM_ORDER_VALUE) {
+        // Track purchase event with user ID
+        trackGAEvent('purchase', {
+          transaction_id: 'order_' + Date.now(),
+          value: totals.total,
+          currency: 'EUR',
+          items: cart.map(item => ({
+            item_id: item.id,
+            item_name: item.name,
+            item_category: item.category,
+            price: item.price,
+            quantity: item.quantity
+          }))
+        });
+        
         clearCart();
         closeCart();
         showOrderConfirmation();
@@ -1193,6 +1240,11 @@ function handleSearch(query) {
   if (query.trim()) {
     activeCategory = null;
     updateCategoryButtons();
+    
+    // Track search event with user ID
+    trackGAEvent('search', {
+      search_term: query
+    });
   }
 
   renderMenu();
@@ -1220,6 +1272,11 @@ function toggleMobileSearch() {
 
 // Initialize
 document.addEventListener("DOMContentLoaded", () => {
+  // Track page view with user ID
+  trackGAEvent('page_view', {
+    page_title: document.title,
+    page_location: window.location.href
+  });
 
   // Categories
   document.querySelectorAll(".category-btn[data-category='all']").forEach(btn => {
