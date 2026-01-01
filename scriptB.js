@@ -1184,25 +1184,94 @@ function attachCartListeners() {
     confirmBtn.addEventListener("click", () => {
       const totals = getCartTotals();
       if (totals.subtotal >= MINIMUM_ORDER_VALUE) {
-        // Track purchase event with user ID
-        trackGAEvent('purchase', {
-          transaction_id: 'order_' + Date.now(),
-          value: totals.total,
-          currency: 'EUR',
-          items: cart.map(item => ({
-            item_id: item.id,
-            item_name: item.name,
-            item_category: item.category,
-            price: item.price,
-            quantity: item.quantity
-          }))
-        });
+        // ===== GA4 TRACKING =====
+        trackPurchaseCompleted();
+        // ========================
 
         clearCart();
         closeCart();
         showOrderConfirmation();
       }
     });
+  }
+}
+
+// ===================================================================
+// GA4 Tracking Functions
+// ===================================================================
+
+/**
+ * Generiere eine eindeutige Transaktions-ID
+ */
+function generateTransactionId() {
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substr(2, 9);
+  return `T-${timestamp}-${random}`;
+}
+
+/**
+ * Hole URL-Parameter (z.B. uid)
+ */
+function getUrlParameter(name) {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(name) || null;
+}
+
+/**
+ * Zähle Bestseller im Warenkorb
+ */
+function countBestsellers() {
+  return cart.filter(item => item.isBestseller).length;
+}
+
+/**
+ * Hauptfunktion: Tracking-Event an GA4 senden
+ */
+function trackPurchaseCompleted() {
+  try {
+    // Sammle alle Daten aus dem aktuellen Cart-Status
+    const totals = getCartTotals();
+    const tipPercentage = Math.round(cartState.selectedTipPercent * 100); // In Prozent (z.B. 10 für 10%)
+    const uid = getUrlParameter('uid'); // Hole uid aus URL
+
+    const transactionId = generateTransactionId();
+
+    // Debug: Zeige Daten in Konsole
+    console.log('📊 GA4 Tracking Event wird gesendet:', {
+      event_name: 'purchase_completed',
+      transaction_id: transactionId,
+      uid_token: uid,
+      tip_percentage: tipPercentage,
+      bestseller_count: countBestsellers(),
+      has_insurance: cartState.hasInsurance,
+      is_co2_neutral: cartState.isCO2Neutral,
+      has_subscription: cartState.hasSubscription,
+      total_value: totals.total
+    });
+
+    // Prüfe ob gtag verfügbar ist
+    if (typeof gtag === 'function') {
+      // Sende Event direkt an GA4 mit gtag
+      gtag('event', 'purchase_completed', {
+        transaction_id: transactionId,
+        uid_token: uid,
+        tip_percentage: tipPercentage,
+        bestseller_count: countBestsellers(),
+        has_insurance: cartState.hasInsurance,
+        is_co2_neutral: cartState.isCO2Neutral,
+        has_subscription: cartState.hasSubscription,
+        total_value: totals.total,
+        currency: 'EUR'
+      });
+
+      // Bestätigung in Konsole
+      console.log('✅ Event erfolgreich an GA4 gesendet via gtag()');
+    } else {
+      console.error('❌ gtag ist nicht verfügbar! Stellen Sie sicher, dass Google Analytics korrekt geladen wurde.');
+    }
+
+  } catch (error) {
+    console.error('❌ Fehler beim Tracking:', error);
   }
 }
 
